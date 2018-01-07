@@ -1,0 +1,14 @@
+<html>
+<head></head>
+<body>
+    <div>
+        <ul>
+            {% for com in results %}
+                <li>公司信息：{{com['com'].info}}  </li>
+                <li>{{com['order']['name']}} 经纱：{{com['order']['js']}} 纬纱：{{com['order']['ws']}}
+                        克重{{com['order']['kz']}} 密度{{com['order']['md']}} 门幅{{com['order']['sjmf']}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
