@@ -20,29 +20,37 @@ def home_page():
 
 @app.route('/search', methods=['GET', 'POST'])
 def search_query():
+    print(request.method)
     if request.method == 'POST':
         name = request.form['name']
         js = request.form['js']
         ws = request.form['ws']
         md = request.form['md']
         kz = request.form['kz']
-        sjmf = request.form['sjmf']
+        xjmf = request.form['xjmf']
+        zz = request.form['zz']
 
-        query = {'js': js, 'ws': ws, 'md': md, 'kz': kz, 'sjmf': sjmf, 'name': name}
+        query = {'js': js, 'ws': ws, 'md': md, 'kz': kz, 'xjmf': xjmf, 'zz': zz, 'name': name}
 
         print(query)
 
-        orders = search(companies, query)[:10]
+        orders = search(companies, query)
+        #orders = orders1+orders2+orders3
 
-        results = []
-        for j, order in enumerate(orders[:5]):
-            #print(order['user_id'], companies[order['user_id']], order)
-            if companies[order['user_id']] not in results:
-                result = {}
-                result['com'] = companies[order['user_id']]
-                result['order'] = order
-                results.append(result)
-        return render_template('result.html', results=results)
+        coms = []
+        search_orders = {}
+        orders = search(companies, query)
+        for order in orders:
+            com = companies[int(order['user_id'])]
+            if com in coms:
+                search_orders[int(order['user_id'])].append(order)
+            else:
+                coms.append(companies[int(order['user_id'])])
+                search_orders[int(order['user_id'])] = [order]
+            #print companies[int(order['user_id'])].info
+        return render_template('result.html', coms=coms, orders=search_orders)
+    if request.method == 'GET':
+        print('get method')
 
         
     

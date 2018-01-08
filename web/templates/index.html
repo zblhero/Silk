@@ -1,16 +1,103 @@
 <html>
-<head></head>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+    
+    <title>纺织大脑</title>
+
+    <script src="static/js/jquery.min.js"></script>
+
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>    
+</head>
 <body>
-    <div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+
+        <form class="form-horizontal" method="POST" action='/search'>
+            <h2 class="form-signin-heading">纺织大脑</h2>
+
+            <div class="form-group">
+                <label for="input-type" class="col-sm-2 control-label">类型</label>
+                <div class="col-sm-10">
+                    <input name="name" type="text" id="inputEmail" class="form-control" placeholder="" autofocus>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="inputJS" class="col-sm-2 control-label">经纱</label>
+                <div class="col-sm-10"> 
+                <input name="js" type="text" id="inputPassword" class="form-control" placeholder="">
+            </div>
+            </div>
+
+            <div class="form-group">
+            <label for="inputWS" class="col-sm-2 control-label">纬纱</label>
+            <div class="col-sm-10"> 
+            <input name="ws" type="text" id="inputPassword" class="form-control" placeholder="">
+        </div>
+        </div>
+
+            <div class="form-group">
+            <label for="inputJS" class="col-sm-2 control-label">密度</label>
+            <div class="col-sm-10"> 
+            <input name="md" type="text" id="inputPassword" class="form-control" placeholder="">
+        </div>
+        </div>
+
+            <div class="form-group">
+            <label for="inputJS" class="col-sm-2 control-label">克重</label>
+            <div class="col-sm-10"> 
+            <input name="kz" type="text" id="inputPassword" class="form-control" placeholder="">
+        </div>
+        </div>
+
+            <div class="form-group">
+            <label for="inputJS" class="col-sm-2 control-label">门幅</label>
+            <div class="col-sm-10"> 
+            <input name="xjmf" type="text" id="inputPassword" class="form-control" placeholder="">
+        </div>
+        </div>
+
+            <div class="form-group">
+            <label for="inputJS" class="col-sm-2 control-label">织机</label>
+            <div class="col-sm-10"> 
+            <select class="form-control" name='zz'>
+                <option value="">--</option>
+                <option value="平纹">平纹</option>
+                <option value="斜纹">斜纹</option>
+            </select>
+        </div>
+        </div>
+            
+            <button class="btn btn-lg btn-primary btn-block" type="submit">搜索</button>
+        </form>
+        </div>
+        </div>
+    </div>
+    <!--div>
     <form method="POST" action='/search'>
         类型<input type="text" name='name'> 
         经纱<input type="text" name='js'> 
         纬纱<input type="text" name='ws'> 
         密度<input type="text" name='md'> 
         克重<input type="text" name='kz'> 
-        门幅<input type="text" name='sjmf'> 
+        门幅<input type="text" name='xjmf'> 
+        机器类型<select name='zz'><option value='平纹'>平纹</option><option value='斜纹'>斜纹</option> </select>
         <input type="submit">Search
     </form>
-    </div>
+    </div-->
 </body>
 </html>

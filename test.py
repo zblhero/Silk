@@ -2,9 +2,9 @@
 from search import *
 
 test_cases = [
-    {'name': u'记忆布', 'js': '100D', 'ws': '120D', 'md': '', 'kz': '', 'sjmf': ''}, # search 1
+    {'name': u'记忆布', 'js': '100D', 'ws': '120D', 'md': '', 'kz': '', 'xjmf': ''}, # search 1
 
-    #{'js': u'170D', 'ws': u'320D', 'md': '16*12', 'kz': 200, 'sjmf':15, 'type': u'记忆布'}, # search2
+    {'js': u'170D', 'ws': u'320D', 'md': '16*12', 'kz': 200, 'xjmf':15, 'zz': u'平纹'}, # search2
 
     #{'js': u'104D', 'ws': u'190D'}
     
