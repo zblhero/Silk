@@ -88,13 +88,14 @@ class Silk():
         #print s
         if s.find('(') != -1 or s.find(u'（') != -1:
             pass
-        elif s.find(' ') != -1 or s.find('/')!= -1 or s.find('*')!=-1:
+        elif s.find(' ') != -1 or s.find('*')!=-1:
             pass
         else:
             # exceptions: 160D*2双纬 300D.600D.700D.900  150D、200D  50D*68D 4.5   R21S紧赛
             #print s
             silks = split_silk(s)
-            if silks.has_key('zz'):
+            #if silks.has_key('zz'):
+            if 'zz' in silks:
                 self.zz = silks['zz']
             self.lines = silks['lines']
 
@@ -112,7 +113,7 @@ def split_silk(s):
         if value.find('/') != -1:
             parts = value.split('/')
             value = parts[0]
-            silks['lines'][i]['parts'] = parts[1:]
+            silks['lines'][i]['parts'] = parts[1]
 
 
         number, silk_type = '', ''
@@ -128,7 +129,7 @@ def split_silk(s):
                 break
         if len(silk_type) > 0: silks['lines'][i]['type'] = silk_type
         
-        #print silks['lines']
+        #print s, silks['lines']
     #print s, silks
     return silks
 
@@ -140,6 +141,9 @@ class Company():
         self.lines = []
         self.products = []
         self.machines = []
+
+        self.fit_lines = []
+        self.fit_machines = []
         
         # order: class, subclass, name_num, name,      cf, zz,   js,   ws,   md,   cpmd,    xjmf,     cpkz,    kz,  type, zjtype,  jg,  cpy, kcl, cpmf,     sjmf,      report,     gm, isjb, zjxl, ylpp, ssl, pz, kjl
         #        系列                        品名           组织   经纱  纬纱   密度  成品密度   下机门幅   成平克重  克重  类型   在机类型  价格       库存 成品门幅    上机门幅                挂码
@@ -148,33 +152,40 @@ class Company():
         #self.search_orders = []
 
     def has_line(self, line): # line: type, number
-        
+        #print 'has', line
         for l in self.lines:
-            #print line, l
-            if l.has_key('number') and line.has_key('number') and l['number'] == line['number']:
-                if l.has_key('type'):
-                    if line.has_key('type') and l['type'] == line['type']:
-                        return True
-                    else:
-                        return False
-                elif line.has_key('type'):
-                    return False
-                else:
-                    return True
+            find = True
+            for key in ['number', 'type', 'parts']:
+                if key in l and key not in line:
+                    find = False
+                if key in line and key not in l:
+                    find = False
+                if key in line and key in l and l[key] != line[key]:
+                    find = False
+            if find:
+                return True
         return False
 
-    def has_lines(self, silk):
+    #def search_lines(self, lines):
+
+
+    def has_lines(self, lines, addfit=False):
         
         find = True
-        for line in silk.lines:
+        for line in lines:
             if not self.has_line(line):
                 find = False
+            else:
+                if addfit:
+                    self.fit_lines.append(line)
         #print(silk.lines, find)
         return find
 
-    def has_machine(self, machine):
+    def has_machine(self, machine, addfit=False):
         for m in self.machines:
             if m == machine:
+                if addfit:
+                    self.fit_machines.append(machine)
                 return True
         return False
 
@@ -216,7 +227,8 @@ def get_orders(companies):
         orders = cursor.fetchall()
         #print('Total orders', len(orders))
         for i, order in enumerate(orders):
-            if not companies.has_key(int(order['user_id'])):
+            #if not companies.has_key(int(order['user_id'])):
+            if int(order['user_id']) not in companies:
                 #print i, order['user_id']
                 pass
             else:
@@ -231,8 +243,13 @@ def get_orders(companies):
                     companies[int(order['user_id'])].machines.append(order['zz'])
 
                 # add lines
-                companies[int(order['user_id'])].lines.extend(js.lines)
-                companies[int(order['user_id'])].lines.extend(ws.lines)
+                for line in js.lines:
+                    #print line
+                    if not companies[int(order['user_id'])].has_line(line):
+                        companies[int(order['user_id'])].lines.append(line)
+                for line in ws.lines:
+                    if not companies[int(order['user_id'])].has_line(line):
+                        companies[int(order['user_id'])].lines.append(line)
 
                 companies[int(order['user_id'])].id = int(order['user_id'])
                 companies[int(order['user_id'])].orders.append(order)
@@ -316,16 +333,19 @@ def search2(query, companies):
         company = companies[com_id] 
         fit = True
 
-        if query.has_key('zz') and len(query['zz']) > 0:
-            if not company.has_machine(query['zz']):
+        if 'zz' in query and len(query['zz']) > 0:
+        # if query.has_key('zz') and len(query['zz']) > 0:
+            if not company.has_machine(query['zz'], addfit=True):
                 fit = False
                 continue
-        if query.has_key('js_class'):
-            if not company.has_lines(query['js_class']):
+        #if query.has_key('js_class'):
+        if 'js_class' in query:
+            if not company.has_lines(query['js_class'].lines, addfit=True):
                 fit = False
                 continue
-        if query.has_key('ws_class'):
-            if not company.has_lines(query['ws_class']):
+        #if query.has_key('ws_class'):
+        if 'ws_class' in query:
+            if not company.has_lines(query['ws_class'].lines, addfit=True):
                 fit = False
                 continue
         if fit:
@@ -473,20 +493,24 @@ def search(companies, query = {'name': u'1234', 'js': u'170D', 'ws': u'320D', 'm
     # fs_pibu_type
     # 品名 经纱 纬纱 坯布密度 工厂名称 类型
 
-    if query.has_key('js'):
+    #if query.has_key('js'):
+    if 'js' in query:
         js = Silk(query['js'])
         query['js_class'] = js
-    if query.has_key('ws'):
+    #if query.has_key('ws'):
+    if 'ws' in query:
         ws = Silk(query['ws'])
         query['ws_class'] = ws
     
-    #print query['js_class'].lines, query['ws_class'].lines
+   
 
     orders1 = search1(query, companies)
-    #coms = search2(query, companies)
+    coms = search2(query, companies)
+
+    print(query, query['js_class'].lines, len(orders1), len(coms))
     #orders3 = search3(query, companies)
     #return orders1, coms, orders3
-    return orders1
+    return orders1, coms
 
 if __name__ == "__main__":
     companies = get_companies()
@@ -499,8 +523,9 @@ if __name__ == "__main__":
     #for key in companies:
     #    print key, companies[key].machines, len(companies[key].orders), companies[key].products
     #query = {'name': u'有光贡缎'}
-    query = {'js': '100D'}
+    query = {'js': '150D/96F'}
 
-    orders = search(companies, query)
-    for order in orders:
-        print companies[int(order['user_id'])].info
+    orders1, coms = search(companies, query)
+    #for com in coms:
+    #    print(com.fit_machines, com.fit_lines)
+    print(len(coms))

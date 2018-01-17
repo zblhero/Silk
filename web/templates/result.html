@@ -23,6 +23,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
+        <h3>精确匹配</h3>
         <table class="table table-striped table-hover">
             <tr><th>公司名称</th><th>相关订单</th></tr>
             {% for com in coms %}
@@ -47,6 +48,33 @@
                 </tr>
             {% endfor %}
         </table>
+        <h3>模糊匹配</h3>
+        <table class="table table-striped table-hover">
+                <tr><th>公司名称</th><th>相关材料</th><th>相关机器</th></tr>
+                {% for com in coms2 %}
+                    <tr>
+                        <td>{{com.values['name']}}</td>
+                        <td>
+                            <table class="table table-condensed">
+                                <tr><th>粗细</th><th>类型</th><th>组成</th></tr>
+                            {% for line in com.fit_lines %}
+                                <tr>
+                                    <td>{{line['number']}}</td>
+                                    <td>{{line['type']}}</td>
+                                    <td>{{line['parts']}}</td>
+                                </tr>
+                            {% endfor %}
+                            </table>
+                        </td>
+                        <td>
+                            <ul>
+                            {% for machine in com.fit_machines %}
+                                <li>{{machine}}</li>
+                            {% endfor %}</ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
     </div>
     </div>
     </div>

@@ -1,3 +1,11 @@
+
+'''
+author: zblhero@gmail.com
+
+    FLASK_APP=hello.py flask run
+'''
+
+
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 import sys
@@ -32,23 +40,24 @@ def search_query():
 
         query = {'js': js, 'ws': ws, 'md': md, 'kz': kz, 'xjmf': xjmf, 'zz': zz, 'name': name}
 
-        print(query)
-
-        orders = search(companies, query)
+        orders1, coms2 = search(companies, query)
         #orders = orders1+orders2+orders3
 
         coms = []
         search_orders = {}
-        orders = search(companies, query)
-        for order in orders:
+        #orders = search1(query, companies)
+        for order in orders1:
             com = companies[int(order['user_id'])]
             if com in coms:
                 search_orders[int(order['user_id'])].append(order)
             else:
                 coms.append(companies[int(order['user_id'])])
                 search_orders[int(order['user_id'])] = [order]
-            #print companies[int(order['user_id'])].info
-        return render_template('result.html', coms=coms, orders=search_orders)
+
+        
+        #coms2 = search2(query, companies)
+        #print companies[int(order['user_id'])].info
+        return render_template('result.html', coms=coms, orders=search_orders, coms2=coms2)
     if request.method == 'GET':
         print('get method')
 
