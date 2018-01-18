@@ -163,7 +163,7 @@ class Company():
                 if key in line and key in l and l[key] != line[key]:
                     find = False
             if find:
-                return True
+                return l
         return False
 
     #def search_lines(self, lines):
@@ -173,11 +173,13 @@ class Company():
         
         find = True
         for line in lines:
-            if not self.has_line(line):
+            l = self.has_line(line)
+            if not l:
                 find = False
             else:
                 if addfit:
-                    self.fit_lines.append(line)
+                    #print(l)
+                    self.fit_lines.append(l)
         #print(silk.lines, find)
         return find
 
@@ -204,10 +206,6 @@ class Company():
 
                     for j, value in enumerate(values):
                         if j == 0:
-                            '''if value.find(u'机器') > -1:
-                                #print '\t\tkey 机器:', value, len(values), item
-                                if len(values) > 1:
-                                    self.machines = values[1]'''
                             if value.find(u'产品') > -1:
                                 #print '\t\tkey 产品:', value, len(values), item
                                 if len(values) > 1:
@@ -242,13 +240,17 @@ def get_orders(companies):
                 if len(order['zz'])>0 and not order['zz']  in companies[int(order['user_id'])].machines:
                     companies[int(order['user_id'])].machines.append(order['zz'])
 
+                
                 # add lines
                 for line in js.lines:
                     #print line
                     if not companies[int(order['user_id'])].has_line(line):
+                        line['order'] = order
+                        #print(len(companies[int(order['user_id'])].lines), line)
                         companies[int(order['user_id'])].lines.append(line)
                 for line in ws.lines:
                     if not companies[int(order['user_id'])].has_line(line):
+                        line['order'] = order
                         companies[int(order['user_id'])].lines.append(line)
 
                 companies[int(order['user_id'])].id = int(order['user_id'])
@@ -301,6 +303,23 @@ def sort(fit_orders, key, desc=True):
                 fit_orders[j] = temp
     return fit_orders
 
+def sort_coms(fit_coms, desc=True):
+    for i, com in enumerate(fit_coms):
+        for j in range(i, len(fit_coms)):
+            # bubble sort
+            swap = False
+            if desc:
+                if fit_coms[i].dis < fit_coms[j].dis:
+                    swap = True
+            else:
+                if fit_coms[i].dis > fit_coms[j].dis:
+                    swap = True
+            if swap:
+                temp = fit_coms[i]
+                fit_coms[i] = fit_coms[j]
+                fit_coms[j] = temp
+    return fit_coms
+
 # totally compatible
 def search1(query, companies):
     # TODO: (0) search cabin first
@@ -313,8 +332,9 @@ def search1(query, companies):
             fit = True
             for key in query:
                 if key in ['name', 'md', 'xjmf', 'kz', 'js', 'ws']:
+                    #print(key, order[key], query[key], str)
                     if len(query[key]) > 0 and order[key] is not None:
-                        if order[key] != query[key]:
+                        if str(order[key]) != str(query[key]):
                             fit = False
             if fit: # when every item fits
                 order['com_id'] = com_id
@@ -350,8 +370,23 @@ def search2(query, companies):
                 continue
         if fit:
             fit_coms.append(company)
-    #print fit_coms
-    return fit_coms
+    
+    
+    # TODO sort the coms
+    for i, com in enumerate(fit_coms):
+        min_dis = 9999
+        for j, line in enumerate(com.fit_lines):
+            dis = get_distance(line['order'], query, keys=['xjmf', 'kz', 'md'])
+            if dis < min_dis:
+                min_dis = dis
+                com.dis = dis
+            #order['dis'] = dis
+
+    #for i, com in enumerate(fit_coms):
+    #    print('sort fit', i, com.dis)
+    fits = sort_coms(fit_coms, desc=False)
+
+    return fits
         #company.has
 
 '''def search2(query, companies):
@@ -452,19 +487,30 @@ def get_distance(order, query, keys=['xjmf', 'kz', 'md']):
     dis = 0.0
     max_value = 500.0
     for key in keys:
+        
         value = order[key]
         
-        if query.has_key(key)> 0:
+        if key in query and len(query[key]) >0:
             # return max distance when search is null
             
-            if not order.has_key(key): 
+            if not key in order: 
                 dis += 1.0
             else:
-                if key in ['xjmf', 'kz']:
+                #print(key, query[key], order[key])
+                if key in ['kz']:
                     try:
                         dis += abs(int(query[key])-int(order[key]))/500.0
                     except:
                         pass
+                if key == 'xjmf':
+                    try:
+                        if float(order[key]) < float(query[key]):
+                            dis += 1.0
+                        else:
+                            dis += 0.0
+                    except ValueError:
+                        print(order[key], query[key])
+                        dis += 1.0
                 if key in ['md']:
                     #print 'get distance', key, query[key], order[key]
                     if order[key].find(query[key]) != -1:
@@ -475,7 +521,10 @@ def get_distance(order, query, keys=['xjmf', 'kz', 'md']):
                         omds = order[key].split('*')
                         if len(qmds) == 2 and len(omds) == 2:
                             #if qmds[0].isdigit() and qmds[1].isdigit() and omds[0].isdigit() and omds[1].isdigit():
-                            dis += (abs(int(qmds[0])-int(omds[0]))/100.0 + abs(int(qmds[1])-int(omds[1]))/100.0)/2
+                            try:
+                                dis += (abs(int(qmds[0])-int(omds[0]))/100.0 + abs(int(qmds[1])-int(omds[1]))/100.0)/2
+                            except ValueError:
+                                dis+=1.0
                             #else:
                             #    dis += 1.0
                             #print 'get distance', qmds, omds, dis, order['kz']
@@ -507,7 +556,7 @@ def search(companies, query = {'name': u'1234', 'js': u'170D', 'ws': u'320D', 'm
     orders1 = search1(query, companies)
     coms = search2(query, companies)
 
-    print(query, query['js_class'].lines, len(orders1), len(coms))
+    #print(query, query['js_class'].lines, len(orders1), len(coms))
     #orders3 = search3(query, companies)
     #return orders1, coms, orders3
     return orders1, coms
@@ -523,7 +572,7 @@ if __name__ == "__main__":
     #for key in companies:
     #    print key, companies[key].machines, len(companies[key].orders), companies[key].products
     #query = {'name': u'有光贡缎'}
-    query = {'js': '150D/96F'}
+    query = {'js': '100D', 'ws': '300D', 'md':'40*32'}
 
     orders1, coms = search(companies, query)
     #for com in coms:

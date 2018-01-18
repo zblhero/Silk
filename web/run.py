@@ -2,7 +2,7 @@
 '''
 author: zblhero@gmail.com
 
-    FLASK_APP=hello.py flask run
+    FLASK_APP=run.py flask run
 '''
 
 
