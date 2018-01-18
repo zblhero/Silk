@@ -137,6 +137,7 @@ def split_silk(s):
 
 class Company():
     def __init__(self):
+        self.dis = 0.0
         self.id = 0
         self.lines = []
         self.products = []
@@ -389,7 +390,7 @@ def search2(query, companies):
     #    print('sort fit', i, com.dis)
     fits = sort_coms(fit_coms, desc=False)
 
-    return fits
+    return fits[:20]
         #company.has
 
 '''def search2(query, companies):
