@@ -334,7 +334,10 @@ def search1(query, companies):
                 if key in ['name', 'md', 'xjmf', 'kz', 'js', 'ws']:
                     #print(key, order[key], query[key], str)
                     if len(query[key]) > 0 and order[key] is not None:
-                        if str(order[key]) != str(query[key]):
+                        try:
+                            if str(order[key]) != str(query[key]):
+                                fit = False
+                        except UnicodeEncodeError:
                             fit = False
             if fit: # when every item fits
                 order['com_id'] = com_id
