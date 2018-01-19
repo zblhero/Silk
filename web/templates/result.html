@@ -31,12 +31,13 @@
                     <td>{{com.values['name']}}</td>
                     <td>
                         <table class="table table-condensed">
-                            <tr><th>名称</th><th>经纱</th><th>纬纱</th><th>密度</th><th>克重</th><th>门幅</th><th>织机</th></tr>
+                            <tr><th>名称</th><th>经纱</th><th>纬纱</th><th>价格</th><th>密度</th><th>克重</th><th>门幅</th><th>织机</th></tr>
                         {% for order in orders[com.id] %}
                             <tr>
                                 <td>{{order['name']}}</td>
                                 <td>{{order['js']}}</td>
                                 <td>{{order['ws']}}</td>
+                                <td>{{order['jg']}}</td>
                                 <td>{{order['md']}}</td>
                                 <td>{{order['kz']}}</td>
                                 <td>{{order['xjmf']}}</td>
