@@ -76,6 +76,11 @@ class Silk():
         #   3. ...
 
     def parse_info(self, s):
+        # 复合丝 20+26 15+15 50+50
+        if s in ['20+26', '15+15', '50+50']:
+            self.lines = [{'number': s}]
+            return
+
         #s = u'150DFDY+（150DDTY+40DSP）'
         s = s.strip(' ')
         re.sub(u'（', '(', s)
@@ -179,7 +184,7 @@ class Company():
                 find = False
             else:
                 if addfit:
-                    #print(l)
+                    #print(l, line)
                     self.fit_lines.append(l)
         #print(silk.lines, find)
         return find
@@ -355,6 +360,8 @@ def search2(query, companies):
     fit_coms, fit_ids = [], []
     for com_id in companies:
         company = companies[com_id] 
+        company.fit_lines = []
+        company.fit_machines = []
         fit = True
 
         if 'zz' in query and len(query['zz']) > 0:
