@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body %}
+    <div class="container">
+    <div class="row">
+    <div class="col-md-12">
+        <div class="user-info">
+            <div class="user-block"><span>{{username}}</span><span><a href='/logout'>退出</a></span></div>
+        </div>
+        <hr>
+        <div class="space" style="height: 10px; margin-bottom: 10px"></div>
+        
+        <div class="col-md-10 col-md-offset-1">
+            <h2>{{com['name']}}</h2>
+            <div>
+                {{com['linkname']}}
+                {{com['linktel']}}
+                {{com['address']}}
+                {{com['telareacode']}}-{{com['tel']}}
+                {{com['info']}}
+            </div>
+            <ul class="com-orders">
+                {% for order in com['fit_orders'] %}
+                    <li class="com-order">{{order['name']}} {{order['js']}} {{order['ws']}} {{order['md']}} {{order['cpmd']}} {{order['xjmf']}} {{order['kz']}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    </div>
+    </div>
+{% endblock %}

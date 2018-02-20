@@ -1,0 +1,237 @@
+#!coding=utf-8
+import datetime
+import pymysql.cursors
+from bs4 import BeautifulSoup
+import re
+
+from process import *
+
+connection = pymysql.connect(host='127.0.0.1',
+                             port=3306,
+                             user='root',
+                             password='',
+                             db='buziyuan',
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
+lines = {}
+orders = []
+companies = {}
+zzs = []
+names = []
+
+class Company():
+    def __init__(self):
+        self.orders = []
+
+def get_lines():
+    
+    with connection.cursor() as cursor:
+        sql = 'select * from deep_line'
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for i, result in enumerate(results):
+            #lines[result['id']] = result
+            line = Line(id=result['id'], s=result['full_name'], shazhi=result['shazhi'], name=result['name'], gz=result['guangzedu'], jianian=result['jianian'], jianianfangxiang=result['jianianfangxiang'], pailie=result['pailie'])
+            lines[result['id']] = line
+    return lines
+
+def get_orders(companies, lines):
+    order = {'name': 'xxx',
+            'md': 1, 'js': '20D', 'ws': '50D'}
+            
+    with connection.cursor() as cursor:
+        #sql = 'INSERT INTO employees (first_name, last_name, hire_date, gender, birth_date) VALUES (%s, %s, %s, %s, %s)'
+        sql = 'select * from deep_order'
+        cursor.execute(sql)
+        orders = cursor.fetchall()
+        #print('Total orders', len(orders))
+        for i, order in enumerate(orders):
+            #if not companies.has_key(int(order['user_id'])):
+            if int(order['user_id']) not in companies:
+                pass
+            else:
+                if order['zz'] not in zzs:
+                    zzs.append(order['zz'])
+                if order['name'] not in names:
+                    names.append(order['name'])
+                
+                jss = order['jss'].split(',')
+                order['js_line'] = [int(js) for js in jss if len(js) > 0]
+                wss = order['wss'].split(',')
+                order['ws_line'] = [int(ws) for ws in wss if len(ws) > 0]
+                #print(i, order['js_line'], order['ws_line'])
+
+                order['lines'] = []
+                for js in jss:
+                    if len(js) > 0:
+                        order['lines'].append(lines[int(js)])
+                for ws in wss:
+                    if len(ws) > 0:
+                        order['lines'].append(lines[int(ws)])
+
+                #print(len(order['lines']), order['jss'], order['wss'])
+
+                companies[int(order['user_id'])]['orders'].append(order)
+
+    return orders
+
+
+
+def get_companies():
+    with connection.cursor() as cursor:
+        #sql = 'INSERT INTO employees (first_name, last_name, hire_date, gender, birth_date) VALUES (%s, %s, %s, %s, %s)'
+        # id user_id name areash areasi areaqu address 
+        sql = 'select * from deep_company'
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        print('com info number:', len(results))
+        for i, com in enumerate(results):
+            com['orders'] = []
+            companies[int(com['user_id'])] = com
+    return companies
+
+def full_pattern(query, content):
+    for word in query:
+        if content.find(word) == -1:
+            return False
+    return True
+
+
+def parse_value(query, value='100D+100D'):
+    value = value.upper()
+
+    cpmf_pattern = re.compile(r'\d+CM$')
+    cpmf_match = cpmf_pattern.match(value)
+    if cpmf_match is not None:
+        query['cpmf'] = cpmf_match.group()
+        return
+
+    kz_pattern = re.compile(r'\d+GSM$')
+    kz_match = kz_pattern.match(value)
+    if kz_match is not None:
+        query['kz'] = kz_match.group()
+        return
+
+    md_pattern = re.compile(r'(\d+\*)+\d+$')
+    md_match = md_pattern.match(value)
+    if md_match is not None:
+        query['md'] = md_match.group()
+        return
+
+    cpmd_pattern = re.compile(r'\d+T$')
+    cpmd_match = cpmd_pattern.match(value)
+    if cpmd_match is not None:
+        query['cpmd'] = cpmd_match.group()
+        return 
+
+    cf_pattern = re.compile(r'\d+\%.*$')
+    cf_match = cf_pattern.match(value)
+    if cf_match is not None:
+        query['cf'] = cf_match.group()
+        return 
+
+    if value in zzs:
+        query['zz'] = value
+        return
+
+    silk = Silk(s=value)
+    if len(silk.lines) > 0:
+        query['silk'] = silk
+        return
+
+    if 'name' in query:
+        query['name'] += value
+    else:
+        query['name'] = value
+
+    
+
+def parse_query(s='100D+100D'):
+    query = {}
+    for value in s.split(' '):
+        parse_value(query, value=value)
+
+    for key in query:
+        print(key, ':', query[key])
+    return query
+
+def search(query):
+    
+    results = []
+    for id in companies:
+        com = companies[id]
+
+        com['fit'] = []
+        com['fit_orders'] = []
+
+        find = {}
+        # init and search if in company info 
+        for key in query:
+            find[key] = False
+            if com['info'] is not None :
+                if key != 'silk' and com['info'].find(query[key]) != -1:
+                    find[key] = True
+                    com['fit'].append(com['info'])
+        
+        # search if in each order
+        for order in com['orders']:
+            find_order = False
+            for key in query:
+                if key == 'silk':
+                    find[key] = True
+                    for line in query['silk'].lines:
+                        find_line = False
+                        for l in order['lines']:
+                            if l.contains(line):
+                                find_line = True
+                        if not find_line:
+                            find[key] = False
+                    find_order = find[key]
+                else:
+                    #if order[key] is not None and order[key] == query[key]:
+                    if order[key] is not None and full_pattern(query[key], order[key]):
+                        find[key] = True
+                        find_order = True
+                '''elif key == 'cpmf':
+                    pass
+                elif key == 'kz':
+                    pass
+                elif key == 'md':
+                    pass
+                elif key == 'cpmd':
+                    pass'''
+                if key == 'name':
+                    for l in order['lines']:
+                        #print(query[key], l.s, order[key], find[key])
+                        if full_pattern(query[key], l.s):
+                            find[key] = True
+                            find_order = True
+            if find_order: # when only one key is True
+                com['fit_orders'].append(order)
+
+
+        find_fit = True        
+        for key in find:
+            if not find[key]:
+                find_fit = False
+        if find_fit:
+            results.append(com)
+            #print('fits:', com['fit'])
+            #print()
+    print(len(results))
+    return results   
+
+
+
+def query_search():
+    pass
+
+if __name__ == "__main__":
+    companies = get_companies()
+    lines = get_lines()
+    orders = get_orders(companies, lines)
+
+    query = parse_query('四面弹 消光横条')
+
+    search(query)
+    

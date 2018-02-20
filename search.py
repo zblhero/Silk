@@ -97,7 +97,7 @@ class Silk():
             pass
         else:
             # exceptions: 160D*2双纬 300D.600D.700D.900  150D、200D  50D*68D 4.5   R21S紧赛
-            #print s
+            print(s)
             silks = split_silk(s)
             #if silks.has_key('zz'):
             if 'zz' in silks:
@@ -224,6 +224,7 @@ class Company():
 def get_orders(companies):
     order = {'name': 'xxx',
             'md': 1, 'js': '20D', 'ws': '50D'}
+            
     with connection.cursor() as cursor:
         #sql = 'INSERT INTO employees (first_name, last_name, hire_date, gender, birth_date) VALUES (%s, %s, %s, %s, %s)'
         sql = 'select * from fs_pibu_cgbj'
@@ -279,14 +280,15 @@ def get_companies():
         # id user_id name areash areasi areaqu address 
         sql = 'select * from fs_member_cominfo'
         cursor.execute(sql)
-        company_infos = cursor.fetchall()
-        print('com info number:', len(company_infos))
-        for i, com in enumerate(company_infos):
+        results = cursor.fetchall()
+        print('com info number:', len(results))
+        for i, com in enumerate(results):
             company = Company()
             company.values = com
+            company.info = com['info']
             #print('company infor', company.info, com)
-            if com['info'] is not None and len(com['info'])>0:
-                company.parse_info(com['info'])
+            #if com['info'] is not None and len(com['info'])>0:
+            #    company.parse_info(com['info'])
             companies[int(com['user_id'])] = company
     return companies
 
@@ -571,6 +573,7 @@ def search(companies, query = {'name': u'1234', 'js': u'170D', 'ws': u'320D', 'm
     #orders3 = search3(query, companies)
     #return orders1, coms, orders3
     return orders1, coms
+
 
 if __name__ == "__main__":
     companies = get_companies()

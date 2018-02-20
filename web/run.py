@@ -7,28 +7,95 @@ author: zblhero@gmail.com
 
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+import time, datetime
 
 import sys
 sys.path.append('../')
 
-from search import *
+#from search import *
+from full_search import *
 
 
 
 app = Flask(__name__) # create the application instance :)
 app.config.from_object(__name__) # load config from this file , flaskr.py
+app.config['DEBUG'] = True
+# set the secret key.  keep this really secret:
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
+#companies = get_companies()
+#orders = get_orders(companies)
 companies = get_companies()
-orders = get_orders(companies)
+lines = get_lines()
+orders = get_orders(companies, lines)
+
 
 @app.route('/')
-def home_page():
+def index():
+    if 'username' in session:
+        username = session['username']
+        return render_template('index.html', username=username)
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        #print(username, password)
+
+        with connection.cursor() as cursor:
+            sql = "select * from deep_user where username='%s' and password='%s'"%(username, password)
+            cursor.execute(sql)
+            users = cursor.fetchall()
+            if len(users) > 0:
+                session['username'] = request.form['username']
+                return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
+
+@app.route('/company/<int:id>', methods=['GET'])
+def company_page(id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    username = session['username']
     
-    return render_template('index.html')
+    if 'query' in session:
+        query = session['query']
+        #print('session query', query)
+        app.logger.info("com: "+str(id))
+        app.logger.info('query'+query)
+        session.pop('query', None)
+
+    company = companies[id]
+    
+    return render_template('company.html', com=company, username=username)
+
+@app.route('/full-search', methods=['POST', 'GET'])
+def full_search_query():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    if request.method == "POST":
+        s = request.form['query']
+        session['query'] = s
+        query = parse_query(s)
+
+        coms = search(query)
+        #print(len(coms))
+        return render_template('result.html', username=username, query=query, coms=coms, orders=[])
+
 
 @app.route('/search', methods=['GET', 'POST'])
 def search_query():
-    print(request.method)
+    #print(request.method)
     if request.method == 'POST':
         name = request.form['name']
         js = request.form['js']
@@ -60,6 +127,9 @@ def search_query():
         return render_template('result.html', coms=coms, orders=search_orders, coms2=coms2)
     if request.method == 'GET':
         print('get method')
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
         
     
