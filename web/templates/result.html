@@ -3,7 +3,22 @@
     <div class="container">
     <div class="row">
     <div class="col-md-12">
-        <div class="user-info">
+        <div class="user-info1">
+            <div class="form-left">
+                <a class="form-title" href="/">纺织大脑</a>
+                <form class="form-horizontal" method="POST" action="/full-search">
+                    <div class="form-group">
+                        <!--label for="inputQuery" class="col-sm-2 control-label"></label-->
+                        <div class="col-sm-7">
+                            <input name="query" type="text" value="{{s}}" id="inputQuery" class="form-control" placeholder="">
+                        </div>
+                        <div class="col-sm-2"> 
+                            <button class="btn btn-primary btn-block" type="submit">模糊搜索</button>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
             <div class="user-block"><span>{{username}}</span><span><a href='/logout'>退出</a></span></div>
         </div>
         <hr>

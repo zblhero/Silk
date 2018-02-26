@@ -72,8 +72,10 @@ class Line:
 
     def contains(self, line):
         for key in self.__dict__:
-            if key not in ['id', 'cgbj_id'] and self.__dict__[key] is not None and self.__dict__[key].find(line.__dict__[key]) == -1:
-                return False
+            if key not in ['id', 'cgbj_id'] and self.__dict__[key] is not None and len(line.__dict__[key]) > 0:
+                #print(key, self.__dict__[key], line.__dict__[key])
+                if self.__dict__[key].find(line.__dict__[key]) == -1:
+                    return False
         return True
 
 
@@ -139,6 +141,7 @@ class Silk():
     def __init__(self, s):
         #self.s = [] # split by '/+ '
         self.lines = []
+        self.s = s
         if len(s) != 0:
             self.parse_info(s)
 

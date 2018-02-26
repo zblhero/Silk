@@ -23,6 +23,13 @@ class Company():
     def __init__(self):
         self.orders = []
 
+def init_coms():
+    for id in companies:
+        com = companies[id]
+        com['fit'] = ''
+        com['fit_orders'] = []
+        com['dis'] = 99999.0
+
 def get_lines():
     
     with connection.cursor() as cursor:
@@ -61,6 +68,7 @@ def get_orders(companies, lines):
                 order['ws_line'] = [int(ws) for ws in wss if len(ws) > 0]
                 #print(i, order['js_line'], order['ws_line'])
 
+                order['dis'] = 0.0
                 order['lines'] = []
                 for js in jss:
                     if len(js) > 0:
@@ -87,6 +95,8 @@ def get_companies():
         print('com info number:', len(results))
         for i, com in enumerate(results):
             com['orders'] = []
+            com['fit_orders'] = []
+            com['dis'] = 99999.0
             companies[int(com['user_id'])] = com
     return companies
 
@@ -130,13 +140,18 @@ def parse_value(query, value='100D+100D'):
         query['cf'] = cf_match.group()
         return 
 
-    if value in zzs:
-        query['zz'] = value
-        return
+    
 
     silk = Silk(s=value)
+    if 'js' in query and len(silk.lines) > 0:
+        query['ws'] = silk
+        return 
     if len(silk.lines) > 0:
-        query['silk'] = silk
+        query['js'] = silk
+        return
+    
+    if value in zzs:
+        query['zz'] = value
         return
 
     if 'name' in query:
@@ -155,50 +170,83 @@ def parse_query(s='100D+100D'):
         print(key, ':', query[key])
     return query
 
-def search(query):
-    
-    results = []
+def search1(query, results=[]):
     for id in companies:
         com = companies[id]
+        for order in com['orders']:
+            find = True
+            for key in query:
+                if key == 'js' or key == 'ws':
+                    if order[key] != query[key].s:
+                        find = False
+                else:
+                    if order[key] != query[key]:
+                        find = False
+            if find:
+                com['fit_orders'].append(order)
+        if id not in results and len(com['fit_orders']) > 0:
+            results.append(id)
+    print('search1', len(results), results)
+    '''for id in results:
+        com = companies[id]
+        print(id, com['fit_orders'][0])'''
+    return results
+                
 
-        com['fit'] = []
-        com['fit_orders'] = []
+
+def search2(query, results=[]):
+    for id in companies:
+        com = companies[id]
 
         find = {}
         # init and search if in company info 
         for key in query:
-            find[key] = False
-            if com['info'] is not None :
-                if key != 'silk' and com['info'].find(query[key]) != -1:
-                    find[key] = True
-                    com['fit'].append(com['info'])
+            if key not in ['js', 'ws']:
+                find[key] = False
+                if com['info'] is not None :
+                    if com['info'].find(query[key]) != -1:
+                        find[key] = True
+                        com['fit'] = com['info']
+            else:
+                for i, line in enumerate(query[key].lines):
+                    find[key+'-'+str(i)] = False
         
         # search if in each order
         for order in com['orders']:
             find_order = False
             for key in query:
-                if key == 'silk':
-                    find[key] = True
-                    for line in query['silk'].lines:
+                if key == 'js' or key == 'ws':
+                    #find[key] = True
+                    for i, line in enumerate(query[key].lines):
                         find_line = False
                         for l in order['lines']:
+                            #print(l.s, line.s, l.contains(line))
                             if l.contains(line):
-                                find_line = True
-                        if not find_line:
-                            find[key] = False
-                    find_order = find[key]
+                                find[key+'-'+str(i)] = True
+                                find_order = True
+                elif key == 'cpmf':  # 400cm
+                    try:
+                        order['dis'] += abs(order[key]-int(query[key][:-2]))/200
+                        find[key] = True
+                    except TypeError:
+                        order['dis'] += 1.0
+                elif key == 'kz':  # 118GSM
+                    try:
+                        order['dis'] += abs(order[key]-int(query[key][:-3]))/300
+                        find[key] = True
+                    except TypeError:
+                        order['dis'] += 1.0
                 else:
                     #if order[key] is not None and order[key] == query[key]:
                     if order[key] is not None and full_pattern(query[key], order[key]):
                         find[key] = True
                         find_order = True
-                '''elif key == 'cpmf':
+                
+                '''elif key == 'kz':  # 118GSM
                     pass
-                elif key == 'kz':
+                elif key == 'md':   # 19*2*25
                     pass
-                elif key == 'md':
-                    pass
-                elif key == 'cpmd':
+                elif key == 'cpmd':  # 430T
                     pass'''
                 if key == 'name':
                     for l in order['lines']:
@@ -207,18 +255,25 @@ def search(query):
                             find[key] = True
                             find_order = True
             if find_order: # when only one key is True
+                if order['dis'] < com['dis']:
+                    com['dis'] = order['dis']
                 com['fit_orders'].append(order)
 
 
-        find_fit = True        
+        find_fit = True    
         for key in find:
             if not find[key]:
                 find_fit = False
-        if find_fit:
-            results.append(com)
+        if find_fit and id not in results:
+            results.append(id)
             #print('fits:', com['fit'])
             #print()
-    print(len(results))
+    print('search2:', len(results), results)
+    '''for id in results:
+        com = companies[id]
+        print(id)
+        for order in com['fit_orders']:
+            print(order['name'])'''
     return results   
 
 
@@ -231,7 +286,8 @@ if __name__ == "__main__":
     lines = get_lines()
     orders = get_orders(companies, lines)
 
-    query = parse_query('四面弹 消光横条')
+    query = parse_query('消光横条四面弹 40CM 100D')
+    print('query:', query)
 
-    search(query)
+    search2(query)
     

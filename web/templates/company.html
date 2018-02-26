@@ -3,7 +3,22 @@
     <div class="container">
     <div class="row">
     <div class="col-md-12">
-        <div class="user-info">
+        <div class="user-info1">
+            <div class="form-left">
+                <a class="form-title" href="/">纺织大脑</a>
+                <form class="form-horizontal" method="POST" action="/full-search">
+                    <div class="form-group">
+                        <!--label for="inputQuery" class="col-sm-2 control-label"></label-->
+                        <div class="col-sm-7"> 
+                            <input name="query" type="text" id="inputQuery" class="form-control" placeholder="">
+                        </div>
+                        <div class="col-sm-2"> 
+                            <button class="btn btn-primary btn-block" type="submit">模糊搜索</button>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
             <div class="user-block"><span>{{username}}</span><span><a href='/logout'>退出</a></span></div>
         </div>
         <hr>
@@ -11,18 +26,27 @@
         
         <div class="col-md-10 col-md-offset-1">
             <h2>{{com['name']}}</h2>
-            <div>
-                {{com['linkname']}}
-                {{com['linktel']}}
-                {{com['address']}}
-                {{com['telareacode']}}-{{com['tel']}}
-                {{com['info']}}
-            </div>
-            <ul class="com-orders">
-                {% for order in com['fit_orders'] %}
-                    <li class="com-order">{{order['name']}} {{order['js']}} {{order['ws']}} {{order['md']}} {{order['cpmd']}} {{order['xjmf']}} {{order['kz']}}</li>
-                {% endfor %}
+            <ul>
+                <li>联系人：{{com['linkname']}}</li>
+                <li>联系电话：{{com['linktel']}}</li>
+                <li>地址：{{com['address']}}</li>
+                <li>公司电话：{{com['telareacode']}}-{{com['tel']}}</li>
+                <li>公司简介：{{com['info']}}</li>
             </ul>
+            <table class="table table-condensed">
+                <tr><th>名称</th><th>经纱</th><th>纬纱</th><th>价格</th><th>成品密度</th><th>门幅</th><th>克重</th><th>织机</th></tr>
+                {% for order in com['fit_orders'] %}
+                    <tr class="com-order">
+                        <td>{{order['name']}}</td>
+                        <td>{{order['js']}}</td>
+                        <td>{{order['ws']}}</td>
+                        <td>{{order['jg']}}</td>
+                        <td>{{order['cpmd']}}</td>
+                        <td>{{order['xjmf']}}</td>
+                        <td>{{order['kz']}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
     </div>
     </div>

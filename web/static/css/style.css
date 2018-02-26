@@ -2,6 +2,10 @@
     margin-top: 4px;
     height: 22px;
 }
+.user-info1{
+    margin-top: 4px;
+    height: 42px;
+}
 .user-block{
     float: right;
 }
@@ -42,4 +46,30 @@ ul.com-orders li{
     list-style: none;
     font-size: 16px;
     margin-bottom: 10px;
+}
+.form-left{
+    float: left;
+    width: 800px;
+}
+.form-left .form-group{
+    margin-bottom: 0px;
+}
+.form-left form{
+    margin-bottom: 0px;
+}
+a.form-title{
+    float: left;
+    width: 100px;
+    font: bold 25px arial,sans-serif;
+}
+a.form-title:link {text-decoration: none;}
+a.form-title:visited {text-decoration: none;}
+a.form-title:hover { text-decoration: none;}
+a.form-title:active {text-decoration: none;}
+.main {
+    height: 100%;
+    margin-bottom: -50px;
+}
+.footer{
+    height: 50px;
 }
