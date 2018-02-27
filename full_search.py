@@ -6,18 +6,23 @@ import re
 
 from process import *
 
-connection = pymysql.connect(host='127.0.0.1',
+
+lines = {}
+orders = []
+companies = {}
+zzs = []
+names = []
+
+def conn():
+    connection = pymysql.connect(host='127.0.0.1',
                              port=3306,
                              user='root',
                              password='',
                              db='buziyuan',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
-lines = {}
-orders = []
-companies = {}
-zzs = []
-names = []
+    return connection
+
 
 class Company():
     def __init__(self):

@@ -29,6 +29,7 @@ companies = get_companies()
 lines = get_lines()
 orders = get_orders(companies, lines)
 
+connection = conn()
 
 @app.route('/')
 def index():
