@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block body %}
+    <div class="alert alert-success" role="alert">
+        This is a primary alert—check it out!
+      </div>
+    <div class="container main">
+    <div class="row">
+    <div class="col-md-12">
+        <div class="user-info">
+            <div class="user-block"><span>{{username}}</span><span><a href='/logout'>退出</a></span></div>
+        </div>
+        <hr>
+                <h1 class="form-signin-heading" align="center" style="margin-bottom:40px"><a href='/'>纺织大脑</a></h1>
+        <h2>添加厂家</h2>
+        <div class="form col-md-6 col-md-offset-3">
+            <form class="form-horizontal" method="POST" action="/new-com">
+                <div class="form-group"> 
+                    <label for='facname' class='col-sm-2'>工厂名称</label>
+                    <div class="col-sm-10"><input name="name" type="text" id="inputQuery" class="form-control" placeholder="e.g. 吴江乔顿纺织有限公司"></div>
+                </div>
+                <div class="form-group"> 
+                    <label for='facname' class='col-sm-2'>工厂地址</label>
+                    <div class="col-sm-10"><input name="address" type="text" id="inputQuery" class="form-control" placeholder="e.g. 盛泽市场东路262号"></div>
+                </div>
+                <div class="form-group"> 
+                    <label for='facname' class='col-sm-2'>联系人</label>
+                    <div class="col-sm-10"><input name="link" type="text" id="inputQuery" class="form-control" placeholder=""></div>
+                </div>
+                <div class="form-group"> 
+                    <label for='facname' class='col-sm-2'>联系方式</label>
+                    <div class="col-sm-10"><input name="tel" type="text" id="inputQuery" class="form-control" placeholder=""></div>
+                </div>
+                <div class="form-group"> 
+                    <label for='facname' class='col-sm-2'>介绍</label>
+                    <div class="col-sm-10"><textarea name="info" type="text" id="inputQuery" class="form-control" placeholder=""></textarea></div>
+                </div>
+
+                <div class="col-sm-2"> 
+                    <button class="btn btn-primary btn-block" type="submit">添加</button>
+                </div>
+                
+            </form>
+        </div>
+        
+    </div>
+    </div>
+    </div>
+{% endblock %}

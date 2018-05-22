@@ -8,6 +8,7 @@ author: zblhero@gmail.com
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 import time, datetime
+import json
 
 import sys
 sys.path.append('../')
@@ -144,6 +145,47 @@ def search_query():
         return render_template('result.html', coms=coms, orders=search_orders, coms2=coms2)
     if request.method == 'GET':
         print('get method')
+
+@app.route('/new-order', methods=['GET', 'POST'])
+def new_order():
+    username = session['username']
+    if request.method == 'POST':
+        print('new order', request.form)
+        added = add_order(request.form)
+        if added:
+            return render_template('new-order.html?suc=1')
+        else:
+            return render_template('new-order.html?suc=0')  
+    elif request.method == 'GET':
+        return render_template('new-order.html', username=username)
+
+@app.route('/new-com', methods=['GET', 'POST'])
+def new_com():
+    username = session['username']
+    if request.method == 'POST':
+        #print('new query is', request.form)
+        added = add_com(request.form)
+        #print(added)
+        if added:
+            return render_template('new-com.html?suc=1')
+        else:
+            return render_template('new-com.html?suc=0')  
+
+    elif request.method == 'GET':
+        
+        return render_template('new-com.html', username=username)
+
+@app.route('/search-com', methods=['GET'])
+def search_com():
+    s = request.args.get('s')
+    sql = "select name from deep_company where name like '%"+s+"%'"
+    print(sql)
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        coms = cursor.fetchmany(10)
+        print(len(coms))
+        return json.dumps(coms)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

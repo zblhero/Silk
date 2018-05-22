@@ -70,6 +70,34 @@ a.form-title:active {text-decoration: none;}
     height: 100%;
     margin-bottom: -50px;
 }
-.footer{
+
+h1 a{
+    text-decoration: none;
+    color: black;
+}
+h1 a:hover{
+    text-decoration: none;
+    color: black;
+}
+
+.ui-com {
+    font-size: 14px;
+    max-height: 100px;
+    max-width: 172px;
+    overflow-y: auto;
+    /* 防止水平滚动条 */
+    overflow-x: hidden;
+}
+
+footer{
     height: 50px;
+    margin-left: 400px;
+}
+footer ul{
+
+}
+footer ul li{
+    list-style: none;
+    float: left;
+    margin-left: 20px;
 }

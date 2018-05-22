@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+{% block body %}
+    <div class="container main">
+    <div class="row">
+    <div class="col-md-12">
+        <div class="user-info">
+            <div class="user-block"><span>{{username}}</span><span><a href='/logout'>退出</a></span></div>
+        </div>
+        <hr>
+                <h1 class="form-signin-heading" align="center" style="margin-bottom:40px"><a href='/'>纺织大脑</a></h1>
+        
+        <!--div class="form"-->
+        <h2>添加订单</h2>
+            <form class="form-horizontal" method="POST" action="/new-order">
+                    <div class="form-group"> 
+                        <label for='facname' class='col-sm-2'>工厂名称</label>
+                        <div class="col-sm-10"><input name="comname" value="" type="text" id="search-com" class="form-control" placeholder="e.g. 媛斯雨服饰"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label for='facname' class='col-sm-2'>丝织名称</label>
+                        <div class="col-sm-10"><input name="name" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 有光五枚缎"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>成分</label>
+                        <div class="col-sm-10"><input name="cf" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 93%N7%SP"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>组织</label>
+                        <div class="col-sm-10"><input name="zz" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 平纹"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>经纱</label>
+                        <div class="col-sm-10"><input name="js" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 300D"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>纬纱</label>
+                        <div class="col-sm-10"><input name="ws" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 300D"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>密度</label>
+                        <div class="col-sm-10"><input name="md" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 126*76"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>成品密度</label>
+                        <div class="col-sm-10"><input name="cpmd" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 400T"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>成品门幅</label>
+                        <div class="col-sm-10"><input name="cpmf" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. "></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>下机门幅</label>
+                        <div class="col-sm-10"><input name="xjmf" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 270"></div>
+                    </div>
+                   
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>上机门幅</label>
+                        <div class="col-sm-10"><input name="sjmf" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 150"></div>
+                    </div>
+                    
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>克重</label>
+                        <div class="col-sm-10"><input name="kz" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 135"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>成品克重</label>
+                        <div class="col-sm-10"><input name="cpkz" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 170"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>类型</label>
+                        <div class="col-sm-10"><input name="type" value="" type="text" id="inputQuery" class="form-control" placeholder="e.g. 订织 在机 现货"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>织机类型</label>
+                        <div class="col-sm-10"><input name="zjtype" value=""  type="text" id="inputQuery" class="form-control" placeholder="e.g. 喷水 喷气"></div>
+                    </div>
+                    <div class="form-group"> 
+                        <label class='col-sm-2'>价格</label>
+                        <div class="col-sm-10"><input name="jg" value=""  type="text" id="inputQuery" class="form-control" placeholder="e.g. 26"></div>
+                    </div>
+                    <div class="col-sm-2"> 
+                        <button class="btn btn-primary btn-block" type="submit">添加</button>
+                    </div>
+                
+            </form>
+        <!--/div-->
+        
+    </div>
+    </div>
+    </div>
+{% endblock %}

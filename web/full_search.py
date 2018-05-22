@@ -283,16 +283,47 @@ def search2(query, results=[]):
 
 
 
-def query_search():
-    pass
+def add_com(query):
+    print('add com', query)
+    with connection.cursor() as cursor:
+        sql = "insert into deep_company (user_id, name, address, linkname, linktel, info) values (0, '%s', '%s', '%s', '%s', '%s')"%(query['name'], query['address'], query['link'], query['tel'], query['info'])
+        print('sql is ', sql)
+        cursor.execute(sql)
+        return True
+    return False
+
+def add_order(query):
+    with connection.cursor() as cursor:
+        sql1 = "select user_id from deep_company where name='%s'"%(query['comname'])
+        cursor.execute(sql1)
+        results = cursor.fetchall()
+        if len(results) > 0:
+            for key in ['cpmf', 'xjmf', 'sjmf', 'kz', 'cpkz', 'jg']:
+                if query[key] == '':
+                    query[key] = 0
+            sql2 = "insert into deep_order \
+                (user_id, name, cf, zz, js, ws, md, cpmd, cpmf, xjmf, sjmf, kz, cpkz, type, zjtype, jg) \
+                values (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', '%s', %f)"\
+                %(results[0], query['name'], query['cf'], query['zz'], query['js'], query['ws'], query['md'],query['cpmd'], int(query['cpmf']),int(query['xjmf']),int(query['sjmf']),int(query['kz']),int(query['cpkz']),query['type'],query['zjtype'], float(query['jg']))
+            print(sql2)
+            cursor.execute(sql2)
+        else:
+            return False
+
+
+        #sql = "insert into deep_order (name, address, link, tel, intro) values ('%s', '%s', '%s', '%s', '%s')"%(query['name'], query['address'], query['link'], query['tel'], query['intro'])
+        #print(sql)
+        #cursor.execute(sql)
+        pass
 
 if __name__ == "__main__":
     companies = get_companies()
     lines = get_lines()
     orders = get_orders(companies, lines)
 
-    query = parse_query('消光横条四面弹 40CM 100D')
-    print('query:', query)
-
-    search2(query)
+    #query = parse_query('消光横条四面弹 40CM 100D')
+    #print('query:', query)
+    #search2(query)
+    query = {'name': '测试工厂', 'address': '', 'link':'', 'tel':'', 'info':''}
+    add_com(query)
     
