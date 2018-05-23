@@ -1,4 +1,27 @@
+
 $(document).ready(function () {  
+
+    var vis = $('#alert1').attr('visible')
+    
+    if(vis == -1){
+        
+    } else if (vis == 1){
+        $('#alerts').css('height', '40px');
+        $('#alert1').css('height', '40px');
+        $('#alert1').css('visibility', 'visible');
+        $('#alert1').hide(2000, function(){
+            //$('#alerts').css('height', '0px');
+        })
+        
+        //$('#alert1').css('visibility', 'visible')
+        //$('#alert1').hide(2000)
+        //$('#alert1').hide()
+        //$('#alert2').attr('visibility') = 'hidden'
+    } else{
+        //$('#alert2').css('visibility', 'visible')
+        //$('#alert2').hide(2000)
+    }
+
     (function(){  
         var insertOptions = function(data, id) {  
             var result = new Array();  

@@ -149,31 +149,36 @@ def search_query():
 @app.route('/new-order', methods=['GET', 'POST'])
 def new_order():
     username = session['username']
+    suc = request.args.get('suc')
+    suc = suc if suc is not None else -1
     if request.method == 'POST':
-        print('new order', request.form)
-        added = add_order(request.form)
+        
+        added = False
+        if len(request.form['name'])>0 and len(request.form['comname'])>0:
+            added = add_order(request.form)
+        print('new order', request.form, added)
         if added:
-            return render_template('new-order.html?suc=1')
+            return redirect('/new-order?suc=1')
         else:
-            return render_template('new-order.html?suc=0')  
+            return redirect('/new-order?suc=0')
     elif request.method == 'GET':
-        return render_template('new-order.html', username=username)
+        return render_template('new-order.html', username=username, suc=suc)
 
 @app.route('/new-com', methods=['GET', 'POST'])
 def new_com():
+    suc = request.args.get('suc') 
+    suc = suc if suc is not None else -1
     username = session['username']
     if request.method == 'POST':
-        #print('new query is', request.form)
         added = add_com(request.form)
-        #print(added)
         if added:
-            return render_template('new-com.html?suc=1')
+            return redirect('/new-com?suc=1')
         else:
-            return render_template('new-com.html?suc=0')  
+            return redirect('/new-com?suc=0')
 
     elif request.method == 'GET':
         
-        return render_template('new-com.html', username=username)
+        return render_template('new-com.html', username=username, suc=suc)
 
 @app.route('/search-com', methods=['GET'])
 def search_com():

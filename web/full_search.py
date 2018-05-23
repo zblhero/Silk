@@ -298,15 +298,20 @@ def add_order(query):
         cursor.execute(sql1)
         results = cursor.fetchall()
         if len(results) > 0:
-            for key in ['cpmf', 'xjmf', 'sjmf', 'kz', 'cpkz', 'jg']:
-                if query[key] == '':
-                    query[key] = 0
+            q = {}
+            for key in query.keys():
+                q[key] = query[key]
+                if key in ['cpmf', 'xjmf', 'sjmf', 'kz', 'cpkz', 'jg']:
+                    if q[key] == '':
+                        q[key] = 0
+            print(results[0], query.keys(), q)
             sql2 = "insert into deep_order \
                 (user_id, name, cf, zz, js, ws, md, cpmd, cpmf, xjmf, sjmf, kz, cpkz, type, zjtype, jg) \
                 values (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', '%s', %f)"\
-                %(results[0], query['name'], query['cf'], query['zz'], query['js'], query['ws'], query['md'],query['cpmd'], int(query['cpmf']),int(query['xjmf']),int(query['sjmf']),int(query['kz']),int(query['cpkz']),query['type'],query['zjtype'], float(query['jg']))
+                %(results[0]['user_id'], q['name'], q['cf'], q['zz'], q['js'], q['ws'], q['md'],q['cpmd'], int(q['cpmf']),int(q['xjmf']),int(q['sjmf']),int(q['kz']),int(q['cpkz']),q['type'],q['zjtype'], float(q['jg']))
             print(sql2)
             cursor.execute(sql2)
+            return True
         else:
             return False
 

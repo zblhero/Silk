@@ -89,6 +89,16 @@ h1 a:hover{
     overflow-x: hidden;
 }
 
+#alerts{
+    /*position: relative;*/
+    height: 0px;
+}
+#alerts div{
+    visibility: hidden;
+    height: 0px;
+}
+
+
 footer{
     height: 50px;
     margin-left: 400px;
