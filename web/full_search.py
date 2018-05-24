@@ -66,11 +66,12 @@ def get_orders(companies, lines):
                     zzs.append(order['zz'])
                 if order['name'] not in names:
                     names.append(order['name'])
-                
-                jss = order['jss'].split(',')
-                order['js_line'] = [int(js) for js in jss if len(js) > 0]
-                wss = order['wss'].split(',')
-                order['ws_line'] = [int(ws) for ws in wss if len(ws) > 0]
+                if order['jss'] is not None:
+                    jss = order['jss'].split(',')
+                    order['js_line'] = [int(js) for js in jss if len(js) > 0]
+                if order['wss'] is not None:
+                    wss = order['wss'].split(',')
+                    order['ws_line'] = [int(ws) for ws in wss if len(ws) > 0]
                 #print(i, order['js_line'], order['ws_line'])
 
                 order['dis'] = 0.0
@@ -284,33 +285,64 @@ def search2(query, results=[]):
 
 
 def add_com(query):
-    print('add com', query)
+    
     with connection.cursor() as cursor:
-        sql = "insert into deep_company (user_id, name, address, linkname, linktel, info) values (0, '%s', '%s', '%s', '%s', '%s')"%(query['name'], query['address'], query['link'], query['tel'], query['info'])
-        print('sql is ', sql)
-        cursor.execute(sql)
+        max_com_id = -1
+        for id in companies:
+            if id > max_com_id:
+                max_com_id = id
+        max_com_id += 1
+        sql = "insert into deep_company (user_id, name, address, linkname, linktel, info) values (%d, '%s', '%s', '%s', '%s', '%s')"%(max_com_id, query['name'], query['address'], query['link'], query['tel'], query['info']) 
+        
+        # TODO: return value and append com
+        effect_row = cursor.execute(sql)
+        
+        if effect_row <= 0:
+            return False
+        
+        com = {}
+        com['user_id'] = max_com_id
+        com['name'] = query['name']
+        com['address'] = query['address']
+        com['linkname'] = query['link']
+        com['linktel'] = query['tel']
+        com['info'] = query['info']
+        com['orders'] = []
+        com['fit_orders'] = []
+        com['dis'] = 99999.0
+        companies[int(com['user_id'])] = com
+
+        print('sql is ', sql, effect_row, max_com_id, com)
         return True
     return False
 
 def add_order(query):
     with connection.cursor() as cursor:
-        sql1 = "select user_id from deep_company where name='%s'"%(query['comname'])
-        cursor.execute(sql1)
-        results = cursor.fetchall()
-        if len(results) > 0:
+        # search com in memory
+        com = None
+        for id in companies:
+            if companies[id]['name'] == query['comname']:
+                com = companies[id]
+                break
+
+        if com is not None:
             q = {}
             for key in query.keys():
                 q[key] = query[key]
                 if key in ['cpmf', 'xjmf', 'sjmf', 'kz', 'cpkz', 'jg']:
                     if q[key] == '':
                         q[key] = 0
-            print(results[0], query.keys(), q)
-            sql2 = "insert into deep_order \
+            print(com, query.keys(), q)
+            sql = "insert into deep_order \
                 (user_id, name, cf, zz, js, ws, md, cpmd, cpmf, xjmf, sjmf, kz, cpkz, type, zjtype, jg) \
                 values (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', '%s', %f)"\
-                %(results[0]['user_id'], q['name'], q['cf'], q['zz'], q['js'], q['ws'], q['md'],q['cpmd'], int(q['cpmf']),int(q['xjmf']),int(q['sjmf']),int(q['kz']),int(q['cpkz']),q['type'],q['zjtype'], float(q['jg']))
-            print(sql2)
-            cursor.execute(sql2)
+                %(com['user_id'], q['name'], q['cf'], q['zz'], q['js'], q['ws'], q['md'],q['cpmd'], int(q['cpmf']),int(q['xjmf']),int(q['sjmf']),int(q['kz']),int(q['cpkz']),q['type'],q['zjtype'], float(q['jg']))
+            print(sql)
+
+             # TODO: return value and append order in com
+            effect_row = cursor.execute(sql)
+            if effect_row <= 0 :
+                return False
             return True
         else:
             return False

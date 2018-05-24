@@ -26,9 +26,11 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 #companies = get_companies()
 #orders = get_orders(companies)
+max_com_id = 0
 companies = get_companies()
 lines = get_lines()
 orders = get_orders(companies, lines)
+
 
 connection = conn()
 
@@ -171,6 +173,7 @@ def new_com():
     username = session['username']
     if request.method == 'POST':
         added = add_com(request.form)
+        print('new com', added)
         if added:
             return redirect('/new-com?suc=1')
         else:
