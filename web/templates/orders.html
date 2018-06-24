@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block body %}
+    
+    <div class="container main">
+    <div class="row">
+    <div class="col-md-12">
+        <div class="user-info">
+            <div class="user-block"><span>{{username}}</span><span><a href='/logout'>退出</a></span></div>
+        </div>
+        <hr>
+        <h1 class="form-signin-heading" align="center" style="margin-bottom:40px"><a href='/'>纺织大脑</a></h1>
+        
+        <div>
+            <table class='table'>
+                <thead class="thead-dark">
+                <tr><th scope="col">丝织名称</th><th scope="col">成分</th>   <th scope="col">组织</th>   <th scope="col">经纱</th>
+                    <th scope="col">纬纱</th>   <th scope="col">密度</th>   <th scope="col">成品密度</th><th scope="col">成品门幅</th>
+                    <th scope="col">下机门幅</th><th scope="col">上机门幅</th><th scope="col">克重</th>   <th scope="col">成品克重</th>
+                    <th scope="col">类型</th>   <th scope="col">织机类型</th><th scope="col">价格</th>   <th scope="col">交期</th></tr>
+                </thead>
+                <tbody>
+                {% for order in orders %}
+                    <tr><td>{{order['name']}}</td><td>{{order['cf']}}</td><td>{{order['zz']}}</td><td>{{order['js']}}</td>
+                        <td>{{order['ws']}}</td><td>{{order['md']}}</td><td>{{order['cpmd']}}</td><td>{{order['cpmf']}}</td>
+                        <td>{{order['xjmf']}}</td><td>{{order['sjmf']}}</td><td>{{order['kz']}}</td><td>{{order['cpkz']}}</td>
+                        <td>{{order['type']}}</td><td>{{order['zjtype']}}</td><td>{{order['jg']}}</td><td></td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="pagination offset-md-3 col-md-6">
+        {% for page in pagination.iter_pages() %}
+            {% if page %}
+            {% if page != pagination.page %}
+                <a href="{{ url_for_other_page(page) }}">{{ page }}</a>
+            {% else %}
+                <strong>{{ page }}</strong>
+            {% endif %}
+            {% else %}
+            <span class=ellipsis>…</span>
+            {% endif %}
+        {% endfor %}
+        {% if pagination.has_next %}
+            <a href="{{ url_for_other_page(pagination.page + 1)
+            }}">下一页 &raquo;</a>
+        {% endif %}
+        </div>
+
+        
+    </div>
+    </div>
+    </div>
+{% endblock %}

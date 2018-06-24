@@ -9,12 +9,15 @@ author: zblhero@gmail.com
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 import time, datetime
 import json
+from pagination import Pagination
 
 import sys
 sys.path.append('../')
 
 #from search import *
 from full_search import *
+
+PER_PAGE = 20
 
 
 
@@ -33,6 +36,12 @@ orders = get_orders(companies, lines)
 
 
 connection = conn()
+
+def url_for_other_page(page):
+    args = request.view_args.copy()
+    args['page'] = page
+    return url_for(request.endpoint, **args)
+app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 @app.route('/')
 def index():
@@ -148,6 +157,39 @@ def search_query():
     if request.method == 'GET':
         print('get method')
 
+@app.route('/orders/', defaults={'page': 1})
+@app.route('/orders/page/<int:page>')
+def show_orders(page):
+    count = get_order_counts()
+    orders = get_order_for_page(page, PER_PAGE, count)
+    print(count, orders[0])
+    if not orders and page != 1:
+        abort(404)
+
+    pagination = Pagination(page, PER_PAGE, count)
+    return render_template('orders.html',
+        pagination=pagination,
+        orders=orders
+    )
+
+@app.route('/companies/', defaults={'page': 1})
+@app.route('/companies/page/<int:page>')
+def show_companies(page):
+    count = get_company_counts()
+    companies = get_company_for_page(page, PER_PAGE, count)
+    print(count, companies[0])
+    if not companies and page != 1:
+        abort(404)
+
+    pagination = Pagination(page, PER_PAGE, count)
+    return render_template('companies.html',
+        pagination=pagination,
+        companies=companies
+    )
+
+
+
+
 @app.route('/new-order', methods=['GET', 'POST'])
 def new_order():
     username = session['username']
@@ -160,7 +202,7 @@ def new_order():
             added = add_order(request.form)
         print('new order', request.form, added)
         if added:
-            return redirect('/new-order?suc=1')
+            return redirect('/orders')
         else:
             return redirect('/new-order?suc=0')
     elif request.method == 'GET':
@@ -175,7 +217,7 @@ def new_com():
         added = add_com(request.form)
         print('new com', added)
         if added:
-            return redirect('/new-com?suc=1')
+            return redirect('/companies')
         else:
             return redirect('/new-com?suc=0')
 

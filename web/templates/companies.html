@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block body %}
+    
+    <div class="container main">
+    <div class="row">
+    <div class="col-md-12">
+        <div class="user-info">
+            <div class="user-block"><span>{{username}}</span><span><a href='/logout'>退出</a></span></div>
+        </div>
+        <hr>
+        <h1 class="form-signin-heading" align="center" style="margin-bottom:40px"><a href='/'>纺织大脑</a></h1>
+        
+        <div>
+            <table class='table'>
+                <thead class="thead-dark">
+                <tr><th scope="col">工厂名称</th><th scope="col">工厂地址</th>   <th scope="col">联系人</th>   <th scope="col">联系方式</th>
+                    <th scope="col">介绍</th></tr>
+                </thead>
+                <tbody>
+                {% for com in companies %}
+                    <tr><td>{{com['name']}}</td><td>{{com['address']}}</td><td>{{com['linkname']}}</td><td>{{com['linktel']}}</td>
+                        <td>{{com['info']}}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+        <div class="pagination offset-md-3 col-md-6">
+        {% for page in pagination.iter_pages() %}
+            {% if page %}
+            {% if page != pagination.page %}
+                <a href="{{ url_for_other_page(page) }}">{{ page }}</a>
+            {% else %}
+                <strong>{{ page }}</strong>
+            {% endif %}
+            {% else %}
+            <span class=ellipsis>…</span>
+            {% endif %}
+        {% endfor %}
+        {% if pagination.has_next %}
+            <a href="{{ url_for_other_page(pagination.page + 1)
+            }}">下一页 &raquo;</a>
+        {% endif %}
+        </div>
+        
+    </div>
+    </div>
+    </div>
+{% endblock %}

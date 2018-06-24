@@ -248,6 +248,33 @@ def process_silks():
                 #cursor.execute(sql)
 
 
+def get_order_counts():
+    with connection.cursor() as cursor:
+        sql = 'select count(*) from deep_order'
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results[0]['count(*)']
+
+def get_order_for_page(page, PER_PAGE, count):
+    with connection.cursor() as cursor:
+        sql = 'select * from deep_order order by id desc limit %d, %d'%((page-1)*PER_PAGE, PER_PAGE)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results
+
+def get_company_counts():
+    with connection.cursor() as cursor:
+        sql = 'select count(*) from deep_company'
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results[0]['count(*)']
+
+def get_company_for_page(page, PER_PAGE, count):
+    with connection.cursor() as cursor:
+        sql = 'select * from deep_company order by id desc limit %d, %d'%((page-1)*PER_PAGE, PER_PAGE)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results
 
 
 if __name__ == "__main__":
